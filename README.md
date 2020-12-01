@@ -6,7 +6,9 @@ This is a wrapper around the data provided by the [DWD](https://www.dwd.de/) on 
 
 The data provided has an odd shape for modern interfaces and isn't really documented.
 
-# Documentation
+# API Documentation
+
+**All of the api endpoints live on `/api/`**
 
 ## `GET /forecast/{station}`
 

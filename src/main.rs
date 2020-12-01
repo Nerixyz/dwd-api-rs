@@ -69,15 +69,16 @@ async fn main() ->  std::io::Result<()> {
     dotenv::dotenv().expect("No .env file");
     HttpServer::new(|| {
         App::new()
-            .wrap(middleware::DefaultHeaders::new()
-                .header("X-DWD-API-Version", "0.1")
-                // allow everyone to use this API
-                .header("Access-Control-Allow-Origin", "*")
-            )
             .wrap(middleware::Compress::default())
-            .service(handle_station)
-            .service(handle_get_stations)
-            .service(handle_get_report)
+            .service(web::scope("/api")
+                .wrap(middleware::DefaultHeaders::new()
+                    .header("X-DWD-API-Version", "0.1")
+                    // allow everyone to use this API
+                    .header("Access-Control-Allow-Origin", "*")
+                )
+                .service(handle_station)
+                .service(handle_get_stations)
+                .service(handle_get_report))
     })
         .bind(
             format!(
