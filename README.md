@@ -8,8 +8,6 @@ The data provided has an odd shape for modern interfaces and isn't really docume
 
 # API Documentation
 
-**All of the api endpoints live on `/api/`**
-
 ## `GET /forecast/{station}`
 
 * `{station}` - The station id - either obtained by `GET /stations` or searching [here](https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication). The station id is static and won't change.

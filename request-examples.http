@@ -1,11 +1,11 @@
 ### Get all stations
-GET http://localhost:8080/api/stations
+GET http://localhost:8080/stations
 Accept: application/json
 
 ### Get the forecast for a given station+join
-GET http://localhost:8080/api/forecast/{{station}}
+GET http://localhost:8080/forecast/{{station}}
 Accept: application/json
 
 ### Get the report for a given station
-GET http://localhost:8080/api/report/{{station}}
+GET http://localhost:8080/report/{{station}}
 Accept: application/json

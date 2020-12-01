@@ -70,15 +70,14 @@ async fn main() ->  std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::Compress::default())
-            .service(web::scope("/api")
-                .wrap(middleware::DefaultHeaders::new()
-                    .header("X-DWD-API-Version", "0.1")
-                    // allow everyone to use this API
-                    .header("Access-Control-Allow-Origin", "*")
-                )
-                .service(handle_station)
-                .service(handle_get_stations)
-                .service(handle_get_report))
+            .wrap(middleware::DefaultHeaders::new()
+                .header("X-DWD-API-Version", "0.1")
+                // allow everyone to use this API
+                .header("Access-Control-Allow-Origin", "*")
+            )
+            .service(handle_station)
+            .service(handle_get_stations)
+            .service(handle_get_report)
     })
         .bind(
             format!(
