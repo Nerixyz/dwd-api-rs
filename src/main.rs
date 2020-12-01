@@ -66,6 +66,7 @@ async fn handle_get_report(web::Path(station): web::Path<String>) -> Result<Http
 
 #[actix_web::main]
 async fn main() ->  std::io::Result<()> {
+    dotenv::dotenv().expect("No .env file");
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::DefaultHeaders::new()
@@ -78,7 +79,11 @@ async fn main() ->  std::io::Result<()> {
             .service(handle_get_stations)
             .service(handle_get_report)
     })
-        .bind("127.0.0.1:8080")?
+        .bind(
+            format!(
+                "{}:{}",
+                std::env::var("DWD_API_HOST").unwrap_or("localhost".to_owned()),
+                std::env::var("DWD_API_PORT").unwrap_or("8080".to_owned())))?
         .run()
         .await
 }

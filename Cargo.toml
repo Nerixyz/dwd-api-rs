@@ -20,3 +20,4 @@ actix-web = "3"
 derive_more = {version = "0.99.11", features = [ "error", "display"] }
 regex = "1.4.2"
 csv = "1.1.5"
+dotenv = "0.15.0"
