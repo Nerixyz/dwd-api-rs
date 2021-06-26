@@ -71,7 +71,7 @@ async fn main() ->  std::io::Result<()> {
         App::new()
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new()
-                .header("X-DWD-API-Version", "0.1")
+                .header("X-DWD-API-Version", env!("CARGO_PKG_VERSION"))
                 // allow everyone to use this API
                 .header("Access-Control-Allow-Origin", "*")
             )
