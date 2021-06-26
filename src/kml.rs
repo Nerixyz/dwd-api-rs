@@ -172,7 +172,7 @@ lazy_static! {
         "RR3".to_owned() => "precipitation_3h",
         "RRS1c".to_owned() => "snow_rain_eq_1h",
         "RRS3c".to_owned() => "snow_rain_eq_3h",
-        "ww".to_owned() => "significant_water",
+        "ww".to_owned() => "significant_weather",
         "W1W2".to_owned() => "past_weather_6h",
         "N".to_owned() => "total_cloud_cover",
         "Neff".to_owned() => "effective_cloud_cover",
