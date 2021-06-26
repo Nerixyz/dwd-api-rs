@@ -70,7 +70,7 @@ For more information take a look at [this](https://opendata.dwd.de/weather/lib/M
 |`dew_point`|K|Dewpoint 2m above surface|Td|
 |`max_temp`|K|Maximum temperature - within the last 12 hours|TX|
 |`min_temp`|K|Minimum temperature - within the last 12 hours|TN|
-|`wind_direction`|0Â°..360Â°|Wind direction|DD|
+|`wind_direction`|0°..360°|Wind direction|DD|
 |`wind_speed`|m/s|Wind speed|FF|
 |`max_wind_gust_1h`|m/s|Maximum wind gust within the last hour|FX1|
 |`max_wind_gust_3h`|m/s|Maximum wind gust within the last 3 hours|FX3|
@@ -81,7 +81,7 @@ For more information take a look at [this](https://opendata.dwd.de/weather/lib/M
 |`precipitation_3h`|kg/m2|Total precipitation during the last 3 hours|RR3|
 |`snow_rain_eq_1h`|kg/m2|Snow-Rain-Equivalent during the last hour|RRS1c|
 |`snow_rain_eq_3h`|kg/m2|Snow-Rain-Equivalent during the last 3 hours|RRS3c|
-|`significant_water`|-|Significant Weather|ww|
+|`significant_weather`|-|Significant Weather|ww|
 |`past_weather_6h`|-|Past weather during the last 6 hours|W1W2|
 |`total_cloud_cover`|% (0..100)|Total cloud cover|N|
 |`effective_cloud_cover`|% (0..100)|Effective cloud cover|Neff|
