@@ -4,7 +4,6 @@ mod mosmix_cfg;
 mod weather_report;
 
 use actix_web::{HttpServer, get, App, web, error, HttpResponse, middleware};
-use actix_web::dev::HttpResponseBuilder;
 use actix_web::http::{StatusCode, header};
 use derive_more::{Error, Display};
 use serde_json::json;
@@ -25,13 +24,6 @@ pub enum DwdError {
 }
 
 impl error::ResponseError for DwdError {
-    fn error_response(&self) -> HttpResponse {
-        HttpResponseBuilder::new(self.status_code())
-            .json(json!({
-                "error": self.to_string()
-            }))
-    }
-
     fn status_code(&self) -> StatusCode {
         match *self {
             DwdError::NotFound => StatusCode::NOT_FOUND,
@@ -39,28 +31,35 @@ impl error::ResponseError for DwdError {
             DwdError::ReadKmlError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
+
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code())
+            .json(json!({
+                "error": self.to_string()
+            }))
+    }
 }
 
 #[get("/forecast/{station}")]
-async fn handle_station(web::Path(station): web::Path<String>) -> Result<HttpResponse, DwdError> {
+async fn handle_station(station: web::Path<String>) -> Result<HttpResponse, DwdError> {
     let forecast = get_forecast(&station).await?;
-    Ok(HttpResponseBuilder::new(StatusCode::OK)
-        .header(header::CACHE_CONTROL, "max-age=1000")
+    Ok(HttpResponse::Ok()
+        .insert_header((header::CACHE_CONTROL, "max-age=1000"))
         .json(forecast))
 }
 
 #[get("/stations")]
 async fn handle_get_stations() -> Result<HttpResponse, DwdError> {
     let stations = get_mosmix_stations().await?;
-    Ok(HttpResponseBuilder::new(StatusCode::OK)
-        .header(header::CACHE_CONTROL, "max-age=604800")
+    Ok(HttpResponse::Ok()
+        .insert_header((header::CACHE_CONTROL, "max-age=604800"))
         .json(stations))
 }
 
 #[get("/report/{station}")]
-async fn handle_get_report(web::Path(station): web::Path<String>) -> Result<HttpResponse, DwdError> {
-    let report = get_weather_report(station).await?;
-    Ok(HttpResponseBuilder::new(StatusCode::OK)
+async fn handle_get_report(station: web::Path<String>) -> Result<HttpResponse, DwdError> {
+    let report = get_weather_report(station.into_inner()).await?;
+    Ok(HttpResponse::Ok()
         .json(report))
 }
 
