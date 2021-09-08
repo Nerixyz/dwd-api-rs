@@ -32,9 +32,13 @@ pub async fn get_forecast(station: &str) -> Result<Forecast, DwdError> {
         .bytes()
         .await.map_err(|_| DwdError::NotFound)?;
 
-    let reader = Cursor::new(res);
-    let mut zip = ZipArchive::new(reader).map_err(|_| DwdError::InvalidFile)?;
-    let file = zip.by_index(0).map_err(|_| DwdError::InvalidFile)?;
+    actix_web::rt::task::spawn_blocking(move || {
+        // unfortunately, zip is blocking
 
-    deserialize_to_forecast(file).map_err(|_| DwdError::ReadKmlError)
+        let reader = Cursor::new(res);
+        let mut zip = ZipArchive::new(reader).map_err(|_| DwdError::InvalidFile)?;
+        let file = zip.by_index(0).map_err(|_| DwdError::InvalidFile)?;
+
+        deserialize_to_forecast(file).map_err(|_| DwdError::ReadKmlError)
+    }).await.map_err(|_| DwdError::InvalidFile)?
 }

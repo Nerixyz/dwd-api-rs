@@ -1,4 +1,3 @@
-use serde_xml_rs::from_reader;
 use crate::weather_forecast::{Forecast, ForecastReferenceModel};
 use chrono::DateTime;
 use std::error::Error;
@@ -101,8 +100,8 @@ struct ProductDefinition {
     format_config: FormatCfg,
 }
 
-pub fn deserialize_to_forecast<R: std::io::Read>(reader: R) -> Result<Forecast, Box<dyn Error>> {
-    let deserialized: Kml = from_reader(reader)?;
+pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box<dyn Error>> {
+    let deserialized: Kml = serde_xml_rs::from_reader(raw)?;
     let product_def = deserialized.document.extended_data.product_definition;
 
     let (data, n_data_points) =
