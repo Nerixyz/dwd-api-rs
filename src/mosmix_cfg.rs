@@ -73,11 +73,9 @@ pub fn parse_mosmix_cfg(data: String) -> Vec<MosmixStation> {
                 hmod_h: values[8].map(|v| i32::from_str(v).ok()).unwrap_or(None),
                 station_type: values[9].unwrap_or("").to_owned(),
             })
-        }).filter(|t| t.is_some())
-            .map(|t| t.unwrap()))
+        }).filter_map(|o| o))
     })
-        .filter(|t| t.is_some())
-        .map(|t| t.unwrap())
+        .filter_map(|o| o)
         .flatten()
         .collect()
 }
