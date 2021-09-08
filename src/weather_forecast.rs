@@ -1,9 +1,7 @@
-use std::collections::HashMap;
+use crate::{kml::deserialize_to_forecast, DwdError};
 use serde::Serialize;
-use crate::DwdError;
-use std::io::Cursor;
+use std::{collections::HashMap, io::Cursor};
 use zip::ZipArchive;
-use crate::kml::deserialize_to_forecast;
 
 #[derive(Serialize)]
 pub struct Forecast {
@@ -27,10 +25,13 @@ pub struct ForecastReferenceModel {
 pub async fn get_forecast(station: &str) -> Result<Forecast, DwdError> {
     let url = format!("https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/{station}/kml/MOSMIX_L_LATEST_{station}.kmz", station = station);
     let res = reqwest::get(&url)
-        .await.map_err(|_| DwdError::NotFound)?
-        .error_for_status().map_err(|_| DwdError::NotFound)?
+        .await
+        .map_err(|_| DwdError::NotFound)?
+        .error_for_status()
+        .map_err(|_| DwdError::NotFound)?
         .bytes()
-        .await.map_err(|_| DwdError::NotFound)?;
+        .await
+        .map_err(|_| DwdError::NotFound)?;
 
     actix_web::rt::task::spawn_blocking(move || {
         // unfortunately, zip is blocking
@@ -40,5 +41,7 @@ pub async fn get_forecast(station: &str) -> Result<Forecast, DwdError> {
         let file = zip.by_index(0).map_err(|_| DwdError::InvalidFile)?;
 
         deserialize_to_forecast(file).map_err(|_| DwdError::ReadKmlError)
-    }).await.map_err(|_| DwdError::InvalidFile)?
+    })
+    .await
+    .map_err(|_| DwdError::InvalidFile)?
 }

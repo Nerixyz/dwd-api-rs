@@ -1,17 +1,15 @@
 use crate::weather_forecast::{Forecast, ForecastReferenceModel};
 use chrono::DateTime;
-use std::error::Error;
-use std::collections::HashMap;
-use std::str::FromStr;
-use serde_json::Value;
-use serde::Deserialize;
 use lazy_static::lazy_static;
 use maplit::hashmap;
+use serde::Deserialize;
+use serde_json::Value;
+use std::{collections::HashMap, error::Error, str::FromStr};
 
 #[derive(Deserialize, Debug)]
 struct Kml {
     #[serde(rename = "Document")]
-    document: KmlDocument
+    document: KmlDocument,
 }
 
 #[derive(Deserialize, Debug)]
@@ -24,7 +22,7 @@ struct KmlDocument {
 
 #[derive(Deserialize, Debug)]
 struct KmlExtDocument {
-    #[serde(rename="ProductDefinition")]
+    #[serde(rename = "ProductDefinition")]
     product_definition: ProductDefinition,
 }
 
@@ -46,7 +44,7 @@ struct KmlPlacemark {
 #[derive(Deserialize, Debug)]
 struct KmlExtPlacemark {
     #[serde(rename = "Forecast")]
-    forecasts: Vec<DwdForecast>
+    forecasts: Vec<DwdForecast>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -61,19 +59,19 @@ struct DwdForecast {
 struct DwdModel {
     name: String,
     #[serde(rename = "referenceTime")]
-    reference_time: String
+    reference_time: String,
 }
 
 #[derive(Deserialize, Debug)]
 struct ReferencedModel {
     #[serde(rename = "Model", default)]
-    models: Vec<DwdModel>
+    models: Vec<DwdModel>,
 }
 
 #[derive(Deserialize, Debug)]
 struct ForecastTimeSteps {
     #[serde(rename = "TimeStep", default)]
-    time_steps: Vec<String>
+    time_steps: Vec<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -104,11 +102,10 @@ pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box
     let deserialized: Kml = serde_xml_rs::from_reader(raw)?;
     let product_def = deserialized.document.extended_data.product_definition;
 
-    let (data, n_data_points) =
-        kml_to_forecast_data(
-            &deserialized.document.placemark.extended_data.forecasts,
-            &product_def.forecast_time_steps.time_steps
-        )?;
+    let (data, n_data_points) = kml_to_forecast_data(
+        &deserialized.document.placemark.extended_data.forecasts,
+        &product_def.forecast_time_steps.time_steps,
+    )?;
 
     Ok(Forecast {
         issuer: product_def.issuer,
@@ -116,33 +113,48 @@ pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box
         coordinates: deserialized.document.placemark.point.coordinates,
         description: deserialized.document.placemark.description,
         generating_process: product_def.generating_process,
-        issue_time: DateTime::parse_from_rfc3339(&product_def.issue_time)?.timestamp_millis() as u64,
-        reference_models: product_def.referenced_models.models.iter().map(|m| ForecastReferenceModel {
-            name: m.name.clone(),
-            reference_time: DateTime::parse_from_rfc3339(&m.reference_time.clone()).map(|d|d.timestamp_millis()).unwrap_or(0) as u64,
-        }).collect(),
+        issue_time: DateTime::parse_from_rfc3339(&product_def.issue_time)?.timestamp_millis()
+            as u64,
+        reference_models: product_def
+            .referenced_models
+            .models
+            .iter()
+            .map(|m| ForecastReferenceModel {
+                name: m.name.clone(),
+                reference_time: DateTime::parse_from_rfc3339(&m.reference_time.clone())
+                    .map(|d| d.timestamp_millis())
+                    .unwrap_or(0) as u64,
+            })
+            .collect(),
         data,
-        n_data_points
+        n_data_points,
     })
 }
 
-fn kml_to_forecast_data(forecasts: &[DwdForecast], time_steps: &[String]) -> Result<(HashMap<&'static str, Vec<Value>>, usize), Box<dyn Error>> {
+fn kml_to_forecast_data(
+    forecasts: &[DwdForecast],
+    time_steps: &[String],
+) -> Result<(HashMap<&'static str, Vec<Value>>, usize), Box<dyn Error>> {
     let mut json = HashMap::<&'static str, Vec<Value>>::new();
-    let time_steps: Vec<Value> = time_steps.
-        iter()
-        .map(|s|
+    let time_steps: Vec<Value> = time_steps
+        .iter()
+        .map(|s| {
             Value::from(
-                    DateTime::parse_from_rfc3339(s)
-                        .map(|d| d.timestamp_millis())
-                        .unwrap_or(0)))
+                DateTime::parse_from_rfc3339(s)
+                    .map(|d| d.timestamp_millis())
+                    .unwrap_or(0),
+            )
+        })
         .collect();
     let n_time_steps = time_steps.len();
     json.insert("time_steps", time_steps);
 
     for forecast in forecasts {
-        let values: Vec<Value> = forecast.value
+        let values: Vec<Value> = forecast
+            .value
             .split_whitespace()
-            .map(|s| f64::from_str(s).map(Value::from).unwrap_or(Value::Null)).collect();
+            .map(|s| f64::from_str(s).map(Value::from).unwrap_or(Value::Null))
+            .collect();
         if values.len() != n_time_steps {
             continue;
         }
