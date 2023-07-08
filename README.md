@@ -216,16 +216,12 @@ The `id` property is used to request the weather forecast.
 type StationsResponse = MosmixStation[];
 
 interface MosmixStation {
-  clu: number,
-  cof_x: number | null,
-  id: string,
-  icao: string | null,
-  name: string,
-  latitude: number,
-  longitude: number,
-  elevation: number,
-  hmod_h: number | null,
-  station_type: string,
+  id: string;
+  icao: string | null;
+  name: string;
+  latitude: number;
+  longitude: number;
+  elevation: number;
 }
 ```
 
