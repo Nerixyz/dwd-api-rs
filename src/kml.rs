@@ -93,6 +93,8 @@ struct ProductDefinition {
     //     format_config: { DefaultUndefSign: String },
 }
 
+type KmlForecastData = (HashMap<&'static str, Vec<Value>>, usize);
+
 pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box<dyn Error>> {
     let deserialized: Kml = serde_xml_rs::from_reader(raw)?;
     let product_def = deserialized.document.extended_data.product_definition;
@@ -129,7 +131,7 @@ pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box
 fn kml_to_forecast_data(
     forecasts: &[DwdForecast],
     time_steps: &[String],
-) -> Result<(HashMap<&'static str, Vec<Value>>, usize), Box<dyn Error>> {
+) -> Result<KmlForecastData, Box<dyn Error>> {
     let mut json = HashMap::<&'static str, Vec<Value>>::new();
     let time_steps: Vec<Value> = time_steps
         .iter()
