@@ -95,7 +95,7 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
             let mut map = HashMap::<String, Value>::with_capacity(param_length + 1);
             map.insert("timestamp".to_owned(), Value::from(timestamp));
             for (idx, value) in record.enumerate() {
-                let prop = properties[idx].clone().to_owned();
+                let prop = properties[idx].to_owned();
                 if !UNDEF_REGEX.is_match(value) {
                     map.insert(
                         prop,
