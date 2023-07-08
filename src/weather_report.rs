@@ -55,16 +55,15 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
 
     let units = {
         let mut unit_map = HashMap::<String, String>::with_capacity(param_length);
-        let mut unit_idx = 0;
-        for unit in iter
+        for (unit_idx, unit) in iter
             .next()
             .ok_or(DwdError::InvalidFile)?
             .map_err(|_| DwdError::InvalidFile)?
             .iter()
             .skip(2)
+            .enumerate()
         {
             unit_map.insert(properties[unit_idx].clone().to_owned(), unit.to_owned());
-            unit_idx += 1;
         }
         unit_map
     };
@@ -77,7 +76,7 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
     }
 
     let data: Vec<HashMap<String, Value>> = iter
-        .map(|record| {
+        .filter_map(|record| {
             if record.is_err() {
                 return None;
             }
@@ -95,26 +94,22 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
 
             let mut map = HashMap::<String, Value>::with_capacity(param_length + 1);
             map.insert("timestamp".to_owned(), Value::from(timestamp));
-            let mut idx = 0;
-            for value in record {
+            for (idx, value) in record.enumerate() {
                 let prop = properties[idx].clone().to_owned();
                 if !UNDEF_REGEX.is_match(value) {
                     map.insert(
                         prop,
-                        if let Ok(value) = f32::from_str(&value.replace(",", ".")) {
+                        if let Ok(value) = f32::from_str(&value.replace(',', ".")) {
                             Value::from(value)
                         } else {
                             Value::from(value)
                         },
                     );
                 }
-                idx += 1;
             }
 
             Some(map)
         })
-        .filter(|v| v.is_some())
-        .map(|v| v.unwrap())
         .collect();
 
     Ok(WeatherReport { units, data })
