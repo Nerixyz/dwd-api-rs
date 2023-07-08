@@ -75,17 +75,9 @@ struct ForecastTimeSteps {
 }
 
 #[derive(Deserialize, Debug)]
-struct FormatCfg {
-    #[serde(rename = "DefaultUndefSign", default)]
-    default_undef_sign: String,
-}
-
-#[derive(Deserialize, Debug)]
 struct ProductDefinition {
     #[serde(rename = "Issuer")]
     issuer: String,
-    #[serde(rename = "ProductID")]
-    product_id: String,
     #[serde(rename = "GeneratingProcess")]
     generating_process: String,
     #[serde(rename = "IssueTime")]
@@ -94,8 +86,11 @@ struct ProductDefinition {
     referenced_models: ReferencedModel,
     #[serde(rename = "ForecastTimeSteps")]
     forecast_time_steps: ForecastTimeSteps,
-    #[serde(rename = "FormatCfg")]
-    format_config: FormatCfg,
+    // unused:
+    //   ProductID:
+    //     product_id: String,
+    //   FormatCfg:
+    //     format_config: { DefaultUndefSign: String },
 }
 
 pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box<dyn Error>> {
