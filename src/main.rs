@@ -73,9 +73,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Compress::default())
             .wrap(
                 middleware::DefaultHeaders::new()
-                    .header("X-DWD-API-Version", env!("CARGO_PKG_VERSION"))
+                    .add(("X-DWD-API-Version", env!("CARGO_PKG_VERSION")))
                     // allow everyone to use this API
-                    .header("Access-Control-Allow-Origin", "*"),
+                    .add(("Access-Control-Allow-Origin", "*")),
             )
             .service(handle_station)
             .service(handle_get_stations)
