@@ -63,7 +63,7 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
             .skip(2)
             .enumerate()
         {
-            unit_map.insert(properties[unit_idx].clone().to_owned(), unit.to_owned());
+            unit_map.insert(properties[unit_idx].to_owned(), unit.to_owned());
         }
         unit_map
     };
