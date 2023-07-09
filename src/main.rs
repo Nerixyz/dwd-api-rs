@@ -1,3 +1,4 @@
+mod errors;
 mod kml;
 mod mosmix_cfg;
 mod weather_forecast;
@@ -7,41 +8,8 @@ use crate::{
     mosmix_cfg::get_mosmix_stations, weather_forecast::get_forecast,
     weather_report::get_weather_report,
 };
-use actix_web::{
-    error, get,
-    http::{header, StatusCode},
-    middleware, web, App, HttpResponse, HttpServer,
-};
-use derive_more::{Display, Error};
-use serde_json::json;
-
-#[derive(Debug, Display, Error)]
-pub enum DwdError {
-    #[display(fmt = "not found")]
-    NotFound,
-
-    #[display(fmt = "invalid file")]
-    InvalidFile,
-
-    #[display(fmt = "read kml error")]
-    ReadKmlError,
-}
-
-impl error::ResponseError for DwdError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
-            DwdError::NotFound => StatusCode::NOT_FOUND,
-            DwdError::InvalidFile => StatusCode::INTERNAL_SERVER_ERROR,
-            DwdError::ReadKmlError => StatusCode::INTERNAL_SERVER_ERROR,
-        }
-    }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(json!({
-            "error": self.to_string()
-        }))
-    }
-}
+use actix_web::{get, http::header, middleware, web, App, HttpResponse, HttpServer};
+use errors::DwdError;
 
 #[get("/forecast/{station}")]
 async fn handle_station(station: web::Path<String>) -> Result<HttpResponse, DwdError> {

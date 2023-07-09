@@ -26,22 +26,22 @@ pub async fn get_forecast(station: &str) -> Result<Forecast, DwdError> {
     let url = format!("https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/{station}/kml/MOSMIX_L_LATEST_{station}.kmz", station = station);
     let res = reqwest::get(&url)
         .await
-        .map_err(|_| DwdError::NotFound)?
+        .map_err(|_| DwdError::NoForecast)?
         .error_for_status()
-        .map_err(|_| DwdError::NotFound)?
+        .map_err(|_| DwdError::NoForecast)?
         .bytes()
         .await
-        .map_err(|_| DwdError::NotFound)?;
+        .map_err(|_| DwdError::NoForecast)?;
 
     actix_web::rt::task::spawn_blocking(move || {
         // unfortunately, zip is blocking
 
         let reader = Cursor::new(res);
-        let mut zip = ZipArchive::new(reader).map_err(|_| DwdError::InvalidFile)?;
-        let file = zip.by_index(0).map_err(|_| DwdError::InvalidFile)?;
+        let mut zip = ZipArchive::new(reader).map_err(|_| DwdError::BadZipFile)?;
+        let file = zip.by_index(0).map_err(|_| DwdError::NoZipEntry)?;
 
-        deserialize_to_forecast(file).map_err(|_| DwdError::ReadKmlError)
+        deserialize_to_forecast(file)
     })
     .await
-    .map_err(|_| DwdError::InvalidFile)?
+    .map_err(|_| DwdError::InternalError)?
 }

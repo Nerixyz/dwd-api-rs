@@ -1,8 +1,11 @@
-use crate::weather_forecast::{Forecast, ForecastReferenceModel};
+use crate::{
+    errors::DwdError,
+    weather_forecast::{Forecast, ForecastReferenceModel},
+};
 use chrono::DateTime;
 use serde::Deserialize;
 use serde_json::Value;
-use std::{collections::HashMap, error::Error, str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
 #[derive(Deserialize, Debug)]
 struct Kml {
@@ -93,14 +96,14 @@ struct ProductDefinition {
 
 type KmlForecastData = (HashMap<&'static str, Vec<Value>>, usize);
 
-pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box<dyn Error>> {
-    let deserialized: Kml = serde_xml_rs::from_reader(raw)?;
+pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, DwdError> {
+    let deserialized: Kml = serde_xml_rs::from_reader(raw).map_err(DwdError::InvalidKml)?;
     let product_def = deserialized.document.extended_data.product_definition;
 
     let (data, n_data_points) = kml_to_forecast_data(
         &deserialized.document.placemark.extended_data.forecasts,
         &product_def.forecast_time_steps.time_steps,
-    )?;
+    );
 
     Ok(Forecast {
         issuer: product_def.issuer,
@@ -108,8 +111,9 @@ pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box
         coordinates: deserialized.document.placemark.point.coordinates,
         description: deserialized.document.placemark.description,
         generating_process: product_def.generating_process,
-        issue_time: DateTime::parse_from_rfc3339(&product_def.issue_time)?.timestamp_millis()
-            as u64,
+        issue_time: DateTime::parse_from_rfc3339(&product_def.issue_time)
+            .map_err(DwdError::InvalidIssueTime)?
+            .timestamp_millis() as u64,
         reference_models: product_def
             .referenced_models
             .models
@@ -126,10 +130,7 @@ pub fn deserialize_to_forecast<R: std::io::Read>(raw: R) -> Result<Forecast, Box
     })
 }
 
-fn kml_to_forecast_data(
-    forecasts: &[DwdForecast],
-    time_steps: &[String],
-) -> Result<KmlForecastData, Box<dyn Error>> {
+fn kml_to_forecast_data(forecasts: &[DwdForecast], time_steps: &[String]) -> KmlForecastData {
     let mut json = HashMap::<&'static str, Vec<Value>>::new();
     let time_steps: Vec<Value> = time_steps
         .iter()
@@ -158,7 +159,7 @@ fn kml_to_forecast_data(
         }
     }
 
-    Ok((json, n_time_steps))
+    (json, n_time_steps)
 }
 
 static KML_ELEMENT_TO_JSON_KEY: phf::Map<&'static str, &'static str> = phf::phf_map! {

@@ -21,10 +21,10 @@ pub struct MosmixStation {
 
 pub async fn get_mosmix_stations() -> Result<Vec<MosmixStation>, DwdError> {
     let res = reqwest::get("https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication")
-        .await.map_err(|_| DwdError::NotFound)?
-        .error_for_status().map_err(|_| DwdError::NotFound)?
+        .await.map_err(|_| DwdError::NoStationListing)?
+        .error_for_status().map_err(|_| DwdError::NoStationListing)?
         .text()
-        .await.map_err(|_| DwdError::NotFound)?;
+        .await.map_err(|_| DwdError::NoStationListing)?;
 
     Ok(parse_mosmix_cfg(res))
 }

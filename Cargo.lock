@@ -184,6 +184,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-error"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b7cb9768f3b52414ae8a94115dd7ce704d1fbb190f7e8c0789b07ec42bd3dec"
+dependencies = [
+ "actix-web-error-derive",
+ "serde",
+]
+
+[[package]]
+name = "actix-web-error-derive"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61e2789c602f0c2ad274009620766690e334fe36f46aeaeea081d19b8af22c43"
+dependencies = [
+ "http",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.23",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -560,9 +582,9 @@ name = "dwd-api"
 version = "0.4.0"
 dependencies = [
  "actix-web",
+ "actix-web-error",
  "chrono",
  "csv",
- "derive_more",
  "dotenv",
  "itertools",
  "lazy_static",
@@ -572,6 +594,7 @@ dependencies = [
  "serde",
  "serde-xml-rs",
  "serde_json",
+ "thiserror",
  "tokio",
  "zip",
 ]

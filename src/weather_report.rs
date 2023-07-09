@@ -28,12 +28,12 @@ pub async fn get_weather_report(station: String) -> Result<WeatherReport, DwdErr
     );
     let res = reqwest::get(&url)
         .await
-        .map_err(|_| DwdError::NotFound)?
+        .map_err(|_| DwdError::NoReport)?
         .error_for_status()
-        .map_err(|_| DwdError::NotFound)?
+        .map_err(|_| DwdError::NoReport)?
         .bytes()
         .await
-        .map_err(|_| DwdError::NotFound)?;
+        .map_err(|_| DwdError::NoReport)?;
     let reader = Cursor::new(res);
 
     parse_weather_report(reader)
@@ -47,8 +47,8 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
 
     let properties = iter
         .next()
-        .ok_or(DwdError::InvalidFile)?
-        .map_err(|_| DwdError::InvalidFile)?;
+        .ok_or(DwdError::NoHeaderRow)?
+        .map_err(|_| DwdError::BadCsvLine)?;
     let properties: Vec<&str> = properties.iter().skip(2).collect();
 
     let param_length = properties.len();
@@ -57,8 +57,8 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
         let mut unit_map = HashMap::<String, String>::with_capacity(param_length);
         for (unit_idx, unit) in iter
             .next()
-            .ok_or(DwdError::InvalidFile)?
-            .map_err(|_| DwdError::InvalidFile)?
+            .ok_or(DwdError::NoUnitRow)?
+            .map_err(|_| DwdError::BadCsvLine)?
             .iter()
             .skip(2)
             .enumerate()
@@ -72,7 +72,7 @@ pub fn parse_weather_report<R: std::io::Read>(report: R) -> Result<WeatherReport
     iter.next();
 
     if units.len() != properties.len() {
-        return Err(DwdError::InvalidFile);
+        return Err(DwdError::UnitMismatch);
     }
 
     let data: Vec<HashMap<String, Value>> = iter

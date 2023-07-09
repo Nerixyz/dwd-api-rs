@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4.3"
+actix-web-error = "0.2"
 
 tokio = { version = "1.11", features = ["full"] }
 reqwest = { version = "0.11", features = ["default", "stream"] }
@@ -23,7 +24,7 @@ chrono = "0.4"
 phf = { version = "0.11", features = ["macros"] }
 regex = "1.5"
 
-derive_more = { version = "0.99", features = [ "error", "display"] }
+thiserror = "1.0"
 
 dotenv = "0.15"
 itertools = "0.11.0"
