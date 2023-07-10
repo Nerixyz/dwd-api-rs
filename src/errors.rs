@@ -43,4 +43,7 @@ pub enum DwdError {
     #[error("Internal error")]
     #[status(500)]
     InternalError,
+    #[error("This route doesn't exist")]
+    #[status(404)]
+    NoRoute,
 }

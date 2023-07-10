@@ -48,6 +48,9 @@ async fn main() -> std::io::Result<()> {
             .service(handle_station)
             .service(handle_get_stations)
             .service(handle_get_report)
+            .default_service(web::to(|| async {
+                Err::<&'static str, _>(DwdError::NoRoute)
+            }))
     })
     .bind(format!(
         "{}:{}",
