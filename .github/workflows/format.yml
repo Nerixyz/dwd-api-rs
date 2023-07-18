@@ -31,6 +31,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check formatting with Prettier
         # Explicit commit, because this isn't tagged yet.
-        uses: Nerixyz/actionsx-prettier@c02599bb34bce9f1961953263c2438c52efc9424
+        uses: Nerixyz/actionsx-prettier@d98bfde3d83c95bdcb44d180b054af08c4e39e24
         with:
           args: -c .
