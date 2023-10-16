@@ -22,7 +22,7 @@ zip = "0.6"
 lazy_static = "1.4"
 chrono = "0.4"
 phf = { version = "0.11", features = ["macros"] }
-regex = "1.9"
+regex = "1.10"
 
 thiserror = "1.0"
 
