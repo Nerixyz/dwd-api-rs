@@ -27,4 +27,4 @@ regex = "1.11"
 thiserror = "2.0"
 
 dotenv = "0.15"
-itertools = "0.13.0"
+itertools = "0.14.0"
