@@ -421,9 +421,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chrono"
-version = "0.4.40"
+version = "0.4.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a7964611d71df112cb1730f2ee67324fcf4d0fc6606acbbe9bfe06df124637c"
+checksum = "c469d952047f47f91b68d1cba3f10d63c11d73e4636f24f08daf0278abf01c4d"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
@@ -1740,9 +1740,9 @@ dependencies = [
 
 [[package]]
 name = "serde-xml-rs"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12ef8209566c27b96b10a096e25abc534e08e9bbbcf8e444b92640f1416dd1c6"
+checksum = "176b7ff880ab6ead7a020e773e9c096467fe347615a3e22ac29300cbdef67a5d"
 dependencies = [
  "log",
  "serde",
