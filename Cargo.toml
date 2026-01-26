@@ -18,7 +18,7 @@ serde-xml-rs = "0.8"
 serde_json = "1.0"
 csv = "1.4"
 
-zip = "7.1"
+zip = "7.2"
 lazy_static = "1.5"
 chrono = "0.4"
 phf = { version = "0.13", features = ["macros"] }
