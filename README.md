@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository is no longer maintained. Rewritten DWD parsing code lives at https://github.com/Nerixyz/Background (`lib/` subdirectory).
+
 # DWD API
 
 This is a wrapper around the data provided by the [DWD](https://www.dwd.de/) on [opendata.dwd.de](https://opendata.dwd.de/).
